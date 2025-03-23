@@ -1,6 +1,10 @@
 AllCops:
   NewCops: enable
 
+inherit_mode:
+  merge:
+    - Exclude
+
 plugins:
   - rubocop-internal_affairs
   - rubocop-dobado_architecture
@@ -8,3 +12,7 @@ plugins:
 Naming/FileName:
   Exclude:
     - lib/rubocop-dobado_architecture.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'

@@ -4,9 +4,6 @@ module RuboCop
   module Cop
     # DobadoArchitectureに関するCop
     module DobadoArchitecture
-      include VisibilityHelp
-      include DefNode
-
       # コントローラーのアクション名として、RESTfulなメソッド名
       # (index, show, new, edit, create, update, destroy)を推奨するためのCop
       #
@@ -21,7 +18,9 @@ module RuboCop
       #     def index; end
       #   end
       class ControllerRecommendRestfulMethods < Base
-        MSG = 'RESTful(index, show, new, edit, create, update, destroy)なメソッド名の使用を推奨します'
+        include DefNode
+
+        MSG = 'RESTful(%<recommended_methods>s)なメソッド名の使用を推奨します'
 
         # @!method action_declarations(node)
         def_node_search :action_declarations, <<~PATTERN
@@ -29,10 +28,27 @@ module RuboCop
         PATTERN
 
         def on_class(node)
-          node = action_declarations(node).first
-          return if %i[index show new edit create update destroy].include?(node.method_name)
+          non_restful_methods(node).each do |action|
+            register_offence(action)
+          end
+        end
 
-          add_offense(node.loc.name)
+        private
+
+        def non_restful_methods(node)
+          action_declarations(node).filter do |action|
+            next if non_public?(action)
+
+            !recommended_methods.include?(action.method_name)
+          end
+        end
+
+        def register_offence(node)
+          add_offense(node.loc.name, message: format(MSG, recommended_methods: recommended_methods.join(', ')))
+        end
+
+        def recommended_methods
+          cop_config['RecommendedMethods'].map(&:to_sym)
         end
       end
     end

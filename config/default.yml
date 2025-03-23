@@ -4,5 +4,13 @@ DobadoArchitecture/ControllerRecommendRestfulMethods:
   Description: 'コントローラーのアクション名として、RESTfulなメソッド名を推奨する'
   Enabled: true
   VersionAdded: '0.1.0'
+  RecommendedMethods:
+    - index
+    - show
+    - new
+    - edit
+    - create
+    - update
+    - destroy
   Include:
     - 'app/controllers/**/*.rb'
